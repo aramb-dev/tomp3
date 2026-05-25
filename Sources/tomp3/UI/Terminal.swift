@@ -29,6 +29,7 @@ func printHeader() {
   print("")
   print("  \(Term.bold)\(Term.cyan)┌──────────────────────────────────────────┐\(Term.reset)")
   print("  \(Term.bold)\(Term.cyan)│           tomp3 converter  v\(AppMeta.version)             │\(Term.reset)")
+  print("  \(Term.bold)\(Term.cyan)│              by aramb-dev                │\(Term.reset)")
   print("  \(Term.bold)\(Term.cyan)└──────────────────────────────────────────┘\(Term.reset)")
   print("")
 }
