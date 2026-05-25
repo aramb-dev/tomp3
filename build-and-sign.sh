@@ -97,7 +97,13 @@ else
     --wait
 
   step "Stapling notarization ticket"
-  xcrun stapler staple "$PKG_OUT"
+  # Retry up to 3 times — Apple's CloudKit CDN is occasionally flaky
+  for attempt in 1 2 3; do
+    xcrun stapler staple "$PKG_OUT" && break
+    warn "Staple attempt $attempt failed, retrying in 5s…"
+    sleep 5
+  done
+  xcrun stapler validate "$PKG_OUT"
   ok "Notarized and stapled"
 fi
 
