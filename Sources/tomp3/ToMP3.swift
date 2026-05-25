@@ -20,7 +20,7 @@ struct ToMP3: AsyncParsableCommand {
         tomp3 --batch ./folder -p high --open
       """,
     version: AppMeta.version,
-    subcommands: [ConvertCommand.self],
+    subcommands: [ConvertCommand.self, UpdateCommand.self],
     defaultSubcommand: ConvertCommand.self
   )
 }
