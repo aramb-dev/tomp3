@@ -8,7 +8,7 @@ import Foundation
 struct ToMP3: AsyncParsableCommand {
   static var configuration = CommandConfiguration(
     commandName: "tomp3",
-    abstract: "🎵  Fast, beautiful audio-to-MP3 converter.",
+    abstract: "Fast, beautiful audio-to-MP3 converter.",
     discussion: """
       Convert any audio (or video) file to MP3 with one command.
       Run without arguments for an interactive prompt, or pass files directly.

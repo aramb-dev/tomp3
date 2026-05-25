@@ -28,7 +28,7 @@ func printError(_ msg: String){ fputs("\n  \(Term.red)✗ \(msg)\(Term.reset)\n\
 func printHeader() {
   print("")
   print("  \(Term.bold)\(Term.cyan)┌──────────────────────────────────────────┐\(Term.reset)")
-  print("  \(Term.bold)\(Term.cyan)│          🎵  tomp3 converter  v\(AppMeta.version)          │\(Term.reset)")
+  print("  \(Term.bold)\(Term.cyan)│           tomp3 converter  v\(AppMeta.version)             │\(Term.reset)")
   print("  \(Term.bold)\(Term.cyan)└──────────────────────────────────────────┘\(Term.reset)")
   print("")
 }
