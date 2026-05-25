@@ -22,7 +22,7 @@ NOTARY_PROFILE="${NOTARY_PROFILE:-notarytool}"
 # ─── Paths ────────────────────────────────────────────────────────────────────
 SCRIPT_DIR="${0:A:h}"
 VERSION=$(cat "$SCRIPT_DIR/VERSION" | tr -d '[:space:]')
-BINARY_SRC="$SCRIPT_DIR/.build/release/tomp3"
+BINARY_SRC="$SCRIPT_DIR/.build/apple/Products/Release/tomp3"
 PAYLOAD_BIN="$SCRIPT_DIR/installer/payload/usr/local/bin/tomp3"
 PKG_COMPONENT="$SCRIPT_DIR/installer/build/tomp3-component.pkg"
 PKG_OUT="$SCRIPT_DIR/installer/build/tomp3-$VERSION-macos.pkg"
