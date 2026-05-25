@@ -36,6 +36,15 @@ struct UpdateCommand: AsyncParsableCommand {
     print("  \(Term.yellow)\(Term.bold)Update available:\(Term.reset)  \(Term.dim)v\(current)\(Term.reset)  →  \(Term.green)\(Term.bold)v\(remoteVersion)\(Term.reset)")
     print("")
 
+    // Show what's new for the remote version
+    if let notes = await fetchWhatsNew(for: remoteVersion) {
+      print("  \(Term.bold)What's new in v\(remoteVersion):\(Term.reset)")
+      for line in notes {
+        print("  \(Term.cyan)·\(Term.reset) \(line)")
+      }
+      print("")
+    }
+
     if checkOnly {
       print("  \(Term.dim)Run \(Term.reset)tomp3 update\(Term.dim) to install.\(Term.reset)\n")
       return
@@ -112,6 +121,35 @@ struct UpdateCommand: AsyncParsableCommand {
       let (data, _) = try await URLSession.shared.data(from: url)
       let v = String(data: data, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
       return v.isEmpty ? nil : v
+    } catch {
+      return nil
+    }
+  }
+
+  /// Fetches CHANGELOG.md and extracts bullet points for the given version section.
+  private func fetchWhatsNew(for version: String) async -> [String]? {
+    guard let url = URL(string: AppMeta.changelogURL) else { return nil }
+    do {
+      let (data, _) = try await URLSession.shared.data(from: url)
+      guard let text = String(data: data, encoding: .utf8) else { return nil }
+
+      var inSection = false
+      var lines: [String] = []
+
+      for line in text.components(separatedBy: "\n") {
+        if line.hasPrefix("## v\(version)") {
+          inSection = true
+          continue
+        }
+        if inSection {
+          if line.hasPrefix("## ") { break }  // next section — stop
+          let trimmed = line
+            .trimmingCharacters(in: .whitespaces)
+            .replacingOccurrences(of: "^- ", with: "", options: .regularExpression)
+          if !trimmed.isEmpty { lines.append(trimmed) }
+        }
+      }
+      return lines.isEmpty ? nil : lines
     } catch {
       return nil
     }
