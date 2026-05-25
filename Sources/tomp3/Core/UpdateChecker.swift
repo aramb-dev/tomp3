@@ -16,10 +16,11 @@ struct UpdateChecker {
 
       guard !remote.isEmpty, remote != AppMeta.version else { return }
 
-      print("""
-        \n  \(Term.yellow)Update available:\(Term.reset) v\(remote)  \(Term.dim)(you have v\(AppMeta.version))\(Term.reset)
-          \(Term.dim)→ \(AppMeta.releaseURL)\(Term.reset)\n
-        """)
+      print("")
+      print("  \(Term.yellow)Update available:\(Term.reset) \(Term.dim)v\(AppMeta.version)\(Term.reset) → \(Term.bold)v\(remote)\(Term.reset)")
+      print("  \(Term.dim)Run \(Term.reset)\(Term.bold)tomp3 update\(Term.reset)\(Term.dim) to install, or download at:\(Term.reset)")
+      print("  \(Term.cyan)\(AppMeta.releaseURL)\(Term.reset)")
+      print("")
     } catch {
       // Offline or timeout — skip silently
     }
