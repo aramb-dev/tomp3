@@ -15,11 +15,9 @@ TEAM_ID="U8N2H82PMJ"
 BUNDLE_ID="dev.aramb.tomp3"
 
 # ─── Notarytool keychain profile ─────────────────────────────────────────────
-# Reuse any profile you've stored with:
-#   xcrun notarytool store-credentials "aramb-dev" \
-#     --apple-id "your@apple-id.com" --team-id U8N2H82PMJ \
-#     --password "xxxx-xxxx-xxxx-xxxx"   ← app-specific password
-NOTARY_PROFILE="aramb-dev"
+# Uses the same "notarytool" profile as SystemVoiceMemos.
+# Override per-run with: NOTARY_PROFILE=other-profile ./build-and-sign.sh
+NOTARY_PROFILE="${NOTARY_PROFILE:-notarytool}"
 
 # ─── Paths ────────────────────────────────────────────────────────────────────
 SCRIPT_DIR="${0:A:h}"
