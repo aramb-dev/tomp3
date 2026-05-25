@@ -1,0 +1,20 @@
+#!/usr/bin/env zsh
+# installer/scripts/postinstall
+# Runs after the pkg installs the binary
+
+set -e
+
+BINARY="/usr/local/bin/tomp3"
+
+# Ensure the binary is executable
+chmod +x "$BINARY"
+
+# Add /usr/local/bin to PATH in common shell configs if not present
+for rc in "$HOME/.zshrc" "$HOME/.bash_profile"; do
+  [[ -f "$rc" ]] || continue
+  if ! grep -q '/usr/local/bin' "$rc" 2>/dev/null; then
+    echo '\nexport PATH="/usr/local/bin:$PATH"' >> "$rc"
+  fi
+done
+
+exit 0

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<installer-gui-script minSpecVersion="2">
+  <title>tomp3</title>
+  <background file="background.png" alignment="bottomleft" scaling="none"/>
+  <welcome    file="welcome.html"   mime-type="text/html"/>
+  <license    file="LICENSE"        mime-type="text/plain"/>
+  <conclusion file="conclusion.html" mime-type="text/html"/>
+
+  <options customize="never" require-scripts="false" rootVolumeOnly="true"/>
+
+  <choices-outline>
+    <line choice="default">
+      <line choice="dev.aramb.tomp3"/>
+    </line>
+  </choices-outline>
+
+  <choice id="default"/>
+  <choice id="dev.aramb.tomp3" visible="false">
+    <pkg-ref id="dev.aramb.tomp3"/>
+  </choice>
+
+  <pkg-ref id="dev.aramb.tomp3" version="0" onConclusion="none">tomp3-component.pkg</pkg-ref>
+</installer-gui-script>
