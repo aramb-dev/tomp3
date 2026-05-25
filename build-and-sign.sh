@@ -14,6 +14,13 @@ PKG_SIGN_ID="Developer ID Installer: Ibn Bilal (U8N2H82PMJ)"
 TEAM_ID="U8N2H82PMJ"
 BUNDLE_ID="dev.aramb.tomp3"
 
+# ─── Notarytool keychain profile ─────────────────────────────────────────────
+# Reuse any profile you've stored with:
+#   xcrun notarytool store-credentials "aramb-dev" \
+#     --apple-id "your@apple-id.com" --team-id U8N2H82PMJ \
+#     --password "xxxx-xxxx-xxxx-xxxx"   ← app-specific password
+NOTARY_PROFILE="aramb-dev"
+
 # ─── Paths ────────────────────────────────────────────────────────────────────
 SCRIPT_DIR="${0:A:h}"
 VERSION=$(cat "$SCRIPT_DIR/VERSION" | tr -d '[:space:]')
@@ -88,7 +95,7 @@ else
   #   --team-id  $TEAM_ID
   #   --password <app-specific-password>
   xcrun notarytool submit "$PKG_OUT" \
-    --keychain-profile "tomp3-notary" \
+    --keychain-profile "$NOTARY_PROFILE" \
     --wait
 
   step "Stapling notarization ticket"
