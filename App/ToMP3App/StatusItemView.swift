@@ -41,7 +41,7 @@ struct StatusItemView: View {
     HStack {
       Image(systemName: "waveform")
         .font(.title2)
-        .foregroundStyle(.accent)
+        .foregroundStyle(Color.accentColor)
       Text("tomp3")
         .font(.headline)
       Spacer()
@@ -82,7 +82,7 @@ struct StatusItemView: View {
         VStack(spacing: 6) {
           Image(systemName: "arrow.down.circle")
             .font(.largeTitle)
-            .foregroundStyle(isTargeted ? .accent : .secondary)
+            .foregroundStyle(isTargeted ? Color.accentColor : .secondary)
           Text("Drop audio or video files here")
             .font(.callout)
             .foregroundStyle(.secondary)
@@ -193,7 +193,7 @@ struct StatusItemView: View {
             .font(.callout)
           }
           .buttonStyle(.plain)
-          .foregroundStyle(.accent)
+          .foregroundStyle(Color.accentColor)
           .padding(.horizontal, 14)
           .padding(.vertical, 8)
           .background(Color.accentColor.opacity(0.07))

@@ -3,6 +3,7 @@ import SwiftUI
 
 // MARK: - Menu Bar Controller
 
+@MainActor
 final class MenuBarController {
 
   private var statusItem: NSStatusItem
