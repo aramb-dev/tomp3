@@ -1,4 +1,5 @@
 import Foundation
+import ToMP3Core
 
 // MARK: - ANSI terminal helpers
 

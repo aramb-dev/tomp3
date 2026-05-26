@@ -1,5 +1,6 @@
 import ArgumentParser
 import Foundation
+import ToMP3Core
 
 // MARK: - Convert Command
 
