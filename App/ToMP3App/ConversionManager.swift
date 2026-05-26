@@ -20,6 +20,13 @@ final class ConversionManager: ObservableObject {
     var success    = false
   }
 
+  // MARK: - Clear
+
+  func clearRecent() {
+    activeJobs.removeAll { $0.isComplete }
+    recentResults.removeAll()
+  }
+
   // MARK: - Convert
 
   func convert(urls: [URL], preset: Preset) {

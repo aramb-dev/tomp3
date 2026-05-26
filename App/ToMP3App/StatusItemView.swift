@@ -10,6 +10,7 @@ struct StatusItemView: View {
   @EnvironmentObject private var updater: AppUpdateChecker
   @State private var selectedPreset: Preset = .high
   @State private var isTargeted = false
+  @State private var justDropped = false   // brief "got it" flash
 
   // Accepted media UTTypes
   private let acceptedTypes: [UTType] = [
@@ -19,6 +20,9 @@ struct StatusItemView: View {
     UTType("com.microsoft.waveform-audio")!,
   ]
 
+  // Running jobs count
+  private var runningCount: Int { manager.activeJobs.filter { !$0.isComplete }.count }
+
   var body: some View {
     VStack(spacing: 0) {
       header
@@ -26,8 +30,8 @@ struct StatusItemView: View {
       presetPicker
       Divider()
       dropZone
-      if !manager.activeJobs.isEmpty { activeJobsList }
-      if !manager.recentResults.isEmpty { recentList }
+      Divider()
+      queueSection
       Spacer(minLength: 0)
       footer
     }
@@ -56,15 +60,22 @@ struct StatusItemView: View {
   // MARK: - Preset Picker
 
   private var presetPicker: some View {
-    Picker("Quality", selection: $selectedPreset) {
-      ForEach(Preset.allCases, id: \.self) { preset in
-        Text(preset.rawValue.capitalized).tag(preset)
+    VStack(alignment: .leading, spacing: 6) {
+      Text("Quality")
+        .font(.caption)
+        .foregroundStyle(.secondary)
+        .padding(.horizontal, 14)
+
+      Picker("Quality", selection: $selectedPreset) {
+        ForEach(Preset.allCases, id: \.self) { preset in
+          Text(preset.rawValue.capitalized).tag(preset)
+        }
       }
+      .labelsHidden()
+      .pickerStyle(.segmented)
+      .padding(.horizontal, 14)
     }
-    .labelsHidden()
-    .pickerStyle(.segmented)
-    .padding(.horizontal, 14)
-    .padding(.vertical, 8)
+    .padding(.vertical, 10)
   }
 
   // MARK: - Drop Zone
@@ -72,21 +83,23 @@ struct StatusItemView: View {
   private var dropZone: some View {
     RoundedRectangle(cornerRadius: 10)
       .strokeBorder(
-        isTargeted ? Color.accentColor : Color.secondary.opacity(0.4),
+        dropBorderColor,
         style: StrokeStyle(lineWidth: 2, dash: [6])
       )
       .background(
         RoundedRectangle(cornerRadius: 10)
-          .fill(isTargeted ? Color.accentColor.opacity(0.08) : Color.clear)
+          .fill(dropFillColor)
       )
       .overlay {
         VStack(spacing: 6) {
-          Image(systemName: "arrow.down.circle")
+          Image(systemName: justDropped ? "checkmark.circle.fill" : "arrow.down.circle")
             .font(.largeTitle)
-            .foregroundStyle(isTargeted ? Color.accentColor : .secondary)
-          Text("Drop audio or video files here")
+            .foregroundStyle(isTargeted || justDropped ? Color.accentColor : .secondary)
+            .animation(.easeInOut(duration: 0.15), value: justDropped)
+          Text(justDropped ? "Added to queue" : "Drop audio or video files here")
             .font(.callout)
-            .foregroundStyle(.secondary)
+            .foregroundStyle(justDropped ? Color.accentColor : .secondary)
+            .animation(.easeInOut(duration: 0.15), value: justDropped)
         }
       }
       .frame(height: 100)
@@ -97,74 +110,130 @@ struct StatusItemView: View {
       }
   }
 
-  // MARK: - Active Jobs
-
-  private var activeJobsList: some View {
-    VStack(alignment: .leading, spacing: 4) {
-      Text("Converting…")
-        .font(.caption)
-        .foregroundStyle(.secondary)
-        .padding(.horizontal, 14)
-
-      ForEach(manager.activeJobs) { job in
-        HStack(spacing: 8) {
-          if job.isComplete {
-            Image(systemName: job.success ? "checkmark.circle.fill" : "xmark.circle.fill")
-              .foregroundStyle(job.success ? .green : .red)
-          } else {
-            ProgressView().controlSize(.mini)
-          }
-          Text(job.fileName)
-            .font(.caption)
-            .lineLimit(1)
-          Spacer()
-          Text(job.preset.rawValue)
-            .font(.caption2)
-            .foregroundStyle(.secondary)
-        }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 2)
-      }
-    }
-    .padding(.bottom, 4)
+  private var dropBorderColor: Color {
+    justDropped ? Color.accentColor : (isTargeted ? Color.accentColor : Color.secondary.opacity(0.4))
   }
 
-  // MARK: - Recent Results
+  private var dropFillColor: Color {
+    justDropped ? Color.accentColor.opacity(0.06) : (isTargeted ? Color.accentColor.opacity(0.08) : Color.clear)
+  }
 
-  private var recentList: some View {
-    VStack(alignment: .leading, spacing: 4) {
-      Divider()
-      Text("Recent")
-        .font(.caption)
-        .foregroundStyle(.secondary)
-        .padding(.horizontal, 14)
-        .padding(.top, 6)
+  // MARK: - Queue Section
 
-      ForEach(manager.recentResults.prefix(5), id: \.job.id) { result in
-        HStack(spacing: 8) {
-          Image(systemName: result.success ? "checkmark.circle.fill" : "xmark.circle.fill")
-            .foregroundStyle(result.success ? .green : .red)
-            .font(.caption)
-          Text(result.displayName)
-            .font(.caption)
-            .lineLimit(1)
-          Spacer()
-          Text(result.outputSize)
+  private var queueSection: some View {
+    VStack(alignment: .leading, spacing: 0) {
+
+      // Section header row
+      HStack {
+        Text(runningCount > 0 ? "Converting…" : "Queue")
+          .font(.caption)
+          .fontWeight(.medium)
+          .foregroundStyle(.secondary)
+        Spacer()
+        if runningCount > 0 {
+          Text("\(runningCount) running")
             .font(.caption2)
             .foregroundStyle(.secondary)
+        } else if !manager.activeJobs.isEmpty || !manager.recentResults.isEmpty {
+          Button("Clear") {
+            manager.clearRecent()
+          }
+          .buttonStyle(.plain)
+          .font(.caption2)
+          .foregroundStyle(.secondary)
+        }
+      }
+      .padding(.horizontal, 14)
+      .padding(.top, 10)
+      .padding(.bottom, 6)
+
+      // Overall progress bar — visible while any job is running
+      if runningCount > 0 {
+        let total     = manager.activeJobs.count
+        let done      = manager.activeJobs.filter(\.isComplete).count
+        let progress  = total > 0 ? Double(done) / Double(total) : 0
+
+        VStack(spacing: 3) {
+          ProgressView(value: progress)
+            .progressViewStyle(.linear)
+            .tint(Color.accentColor)
+          HStack {
+            Text("\(done) of \(total) done")
+              .font(.caption2)
+              .foregroundStyle(.secondary)
+            Spacer()
+          }
         }
         .padding(.horizontal, 14)
-        .padding(.vertical, 1)
+        .padding(.bottom, 8)
       }
+
+      // Job rows
+      let allRows = manager.activeJobs + manager.recentResults.prefix(5).map { r in
+        // map recent results back into the same row shape
+        ConversionManager.ActiveJob(
+          fileName: r.displayName,
+          preset: r.job.preset,
+          isComplete: true,
+          success: r.success
+        )
+      }
+
+      if allRows.isEmpty {
+        Text("No conversions yet — drop files above")
+          .font(.caption)
+          .foregroundStyle(.tertiary)
+          .frame(maxWidth: .infinity, alignment: .center)
+          .padding(.vertical, 16)
+      } else {
+        ForEach(allRows) { job in
+          jobRow(job)
+        }
+      }
+
+      Spacer(minLength: 6)
     }
-    .padding(.bottom, 6)
+    .frame(minHeight: 100)
+  }
+
+  @ViewBuilder
+  private func jobRow(_ job: ConversionManager.ActiveJob) -> some View {
+    HStack(spacing: 8) {
+      Group {
+        if job.isComplete {
+          Image(systemName: job.success ? "checkmark.circle.fill" : "xmark.circle.fill")
+            .foregroundStyle(job.success ? .green : .red)
+        } else {
+          ProgressView()
+            .controlSize(.mini)
+            .frame(width: 14, height: 14)
+        }
+      }
+      .frame(width: 16)
+
+      Text(job.fileName)
+        .font(.caption)
+        .lineLimit(1)
+        .truncationMode(.middle)
+
+      Spacer()
+
+      Text(job.preset.rawValue.capitalized)
+        .font(.caption2)
+        .foregroundStyle(.secondary)
+        .padding(.horizontal, 5)
+        .padding(.vertical, 2)
+        .background(Color.secondary.opacity(0.12), in: RoundedRectangle(cornerRadius: 4))
+    }
+    .padding(.horizontal, 14)
+    .padding(.vertical, 4)
   }
 
   // MARK: - Footer
 
   private var footer: some View {
     VStack(spacing: 0) {
-      // Update banner — shown when a new version is available
+      // Update banner
       if let version = updater.availableVersion {
         Divider()
         if updater.isInstalling {
@@ -237,6 +306,7 @@ struct StatusItemView: View {
 
     guard panel.runModal() == .OK else { return }
     manager.convert(urls: panel.urls, preset: selectedPreset)
+    flashDropZone()
   }
 
   private func handleDrop(_ providers: [NSItemProvider]) -> Bool {
@@ -254,8 +324,16 @@ struct StatusItemView: View {
     group.notify(queue: .main) {
       if !urls.isEmpty {
         manager.convert(urls: urls, preset: selectedPreset)
+        flashDropZone()
       }
     }
     return true
+  }
+
+  private func flashDropZone() {
+    justDropped = true
+    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+      justDropped = false
+    }
   }
 }
