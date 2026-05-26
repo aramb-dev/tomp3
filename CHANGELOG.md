@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.8
+- Add Finder Extension setup guide — CLI: tomp3 setup-finder, menu bar: inline step-by-step banner
+- Add right-click context menu on menu bar icon: Check for Updates / Quit
+- Add live conversion queue with progress bar and per-file status
+- Quality label now appears above the preset picker
+- Drop zone flashes confirmation when files are received
+- Fix installer conclusion page encoding (UTF-8 charset)
+
+
 ## v0.7
 - Add menu bar app — drag-drop, preset picker, live progress, notifications
 - Add Finder right-click: Convert to MP3 with all 5 presets
