@@ -88,10 +88,28 @@ ok "Landing page updated"
 # ─── 4. Commit tomp3 repo ────────────────────────────────────────────────────
 step "Committing tomp3 repo"
 cd "$SCRIPT_DIR"
-git add -A
+# Selective add — exclude build artifacts (installer/payload/Applications/
+# and installer/build/*.pkg are gitignored, but be explicit here)
+git add \
+  VERSION \
+  CHANGELOG.md \
+  Sources/ \
+  App/project.yml \
+  App/ExportOptions.plist \
+  App/ToMP3App/ \
+  App/FinderExtension/ \
+  installer/payload/usr/ \
+  installer/scripts/ \
+  installer/resources/ \
+  installer/Distribution.xml \
+  installer/build/tomp3-component.pkg \
+  README.md \
+  build-and-sign.sh \
+  release.sh \
+  .gitignore 2>/dev/null || true
 git commit -m "release: v$VERSION
 
-$(for note in "${NOTES[@]}"; do echo "- $note"; done)"
+$(for note in "${NOTES[@]}"; do echo "- $note"; done)" 2>/dev/null || warn "Nothing new to commit"
 git tag "v$VERSION" 2>/dev/null || warn "Tag v$VERSION already exists — skipping"
 git push
 git push origin "v$VERSION" 2>/dev/null || true
