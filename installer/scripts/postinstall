@@ -1,20 +1,35 @@
 #!/usr/bin/env zsh
 # installer/scripts/postinstall
-# Runs after the pkg installs the binary
+# Runs after the pkg installs both the CLI binary and the menu bar app.
 
 set -e
 
 BINARY="/usr/local/bin/tomp3"
+APP="/Applications/ToMP3App.app"
 
-# Ensure the binary is executable
+# ── CLI ───────────────────────────────────────────────────────────────────────
+
 chmod +x "$BINARY"
 
-# Add /usr/local/bin to PATH in common shell configs if not present
+# Add /usr/local/bin to PATH in common shell configs if not already present
 for rc in "$HOME/.zshrc" "$HOME/.bash_profile"; do
   [[ -f "$rc" ]] || continue
   if ! grep -q '/usr/local/bin' "$rc" 2>/dev/null; then
     echo '\nexport PATH="/usr/local/bin:$PATH"' >> "$rc"
   fi
 done
+
+# ── Menu bar app ──────────────────────────────────────────────────────────────
+
+if [[ -d "$APP" ]]; then
+  # Relaunch the app if it was already running (update scenario)
+  if pgrep -x "ToMP3App" > /dev/null 2>&1; then
+    pkill -x "ToMP3App" 2>/dev/null || true
+    sleep 0.5
+  fi
+  # Open the app as the installing user (not root)
+  REAL_USER=$(stat -f "%Su" /dev/console 2>/dev/null || echo "$USER")
+  sudo -u "$REAL_USER" open "$APP" &
+fi
 
 exit 0

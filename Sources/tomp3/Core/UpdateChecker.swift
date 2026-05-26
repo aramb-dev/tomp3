@@ -1,3 +1,4 @@
+import ToMP3Core
 import Foundation
 
 // MARK: - Self-update checker

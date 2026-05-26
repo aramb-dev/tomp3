@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>method</key>
+  <string>developer-id</string>
+
+  <key>teamID</key>
+  <string>U8N2H82PMJ</string>
+
+  <!-- Let Xcode pick the right Developer ID Application cert automatically -->
+  <key>signingStyle</key>
+  <string>automatic</string>
+
+  <!-- Include the Finder extension inside the app bundle -->
+  <key>embedOnDemandResourcesAssetPacksInBundle</key>
+  <true/>
+</dict>
+</plist>
