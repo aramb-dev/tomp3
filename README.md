@@ -1,9 +1,9 @@
-# 🎵 tomp3
+# 🔈 tomp3
 
 A fast, beautiful terminal tool for converting audio to MP3 — written in Swift.
 
 ```
-OVERVIEW: 🎵  Fast, beautiful audio-to-MP3 converter.
+OVERVIEW: 🔈  Fast, beautiful audio-to-MP3 converter.
 
 USAGE: tomp3 [<file> ...] [--preset <preset>] [--output <dir>] [--batch] [--open] [--quiet]
 ```
