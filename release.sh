@@ -81,7 +81,15 @@ done
 NEW_ENTRY="  {\n    version: \"$VERSION\",\n    items: [\n$ITEMS_JS    ],\n  },"
 
 # Insert new entry at the top of the changelog array
-perl -i -0pe "s/(const changelog = \[)(\n)/$1\n$NEW_ENTRY\n/" "$SITE_PAGE"
+# Write entry to a tmpfile so slashes/quotes in notes don't break the regex
+ENTRY_FILE=$(mktemp)
+printf '%s\n' "$NEW_ENTRY" > "$ENTRY_FILE"
+perl -i -0777 -pe '
+  open(my $fh, "<", "'"$ENTRY_FILE"'") or die $!;
+  my $entry = do { local $/; <$fh> }; close $fh;
+  s/(const changelog = \[)\n/$1\n$entry\n/;
+' "$SITE_PAGE"
+rm -f "$ENTRY_FILE"
 
 ok "Landing page updated"
 

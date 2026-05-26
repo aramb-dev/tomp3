@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.7
+- Add menu bar app — drag-drop, preset picker, live progress, notifications
+- Add Finder right-click: Convert to MP3 with all 5 presets
+- Update through menu bar or CLI — one pkg keeps everything in sync
+- Fix: files with parentheses in name now resolve correctly
+- Add -v / --version flag
+- Add tomp3 help with styled output
+- Auto-relaunch after tomp3 update
+
+
 ## v0.5
 - Fixed emoji header rendering on fresh installs (UTF-8 locale issue)
 - Added "by aramb-dev" to the header
