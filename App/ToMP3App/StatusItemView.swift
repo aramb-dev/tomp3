@@ -7,6 +7,7 @@ import UniformTypeIdentifiers
 struct StatusItemView: View {
 
   @EnvironmentObject private var manager: ConversionManager
+  @EnvironmentObject private var updater: AppUpdateChecker
   @State private var selectedPreset: Preset = .high
   @State private var isTargeted = false
 
@@ -161,18 +162,66 @@ struct StatusItemView: View {
   // MARK: - Footer
 
   private var footer: some View {
-    HStack {
-      Text("tomp3")
-        .font(.caption2)
-        .foregroundStyle(.tertiary)
-      Spacer()
-      Button("Quit") { NSApp.terminate(nil) }
-        .buttonStyle(.plain)
-        .font(.caption2)
-        .foregroundStyle(.secondary)
+    VStack(spacing: 0) {
+      // Update banner — shown when a new version is available
+      if let version = updater.availableVersion {
+        Divider()
+        if updater.isInstalling {
+          HStack(spacing: 8) {
+            ProgressView(value: updater.installProgress)
+              .progressViewStyle(.linear)
+            Text("\(Int(updater.installProgress * 100))%")
+              .font(.caption2)
+              .foregroundStyle(.secondary)
+              .monospacedDigit()
+          }
+          .padding(.horizontal, 14)
+          .padding(.vertical, 8)
+        } else {
+          Button {
+            updater.install(version: version)
+          } label: {
+            HStack(spacing: 6) {
+              Image(systemName: "arrow.down.circle.fill")
+              Text("Update to v\(version)")
+                .fontWeight(.medium)
+              Spacer()
+              Text("Free")
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+            }
+            .font(.callout)
+          }
+          .buttonStyle(.plain)
+          .foregroundStyle(.accent)
+          .padding(.horizontal, 14)
+          .padding(.vertical, 8)
+          .background(Color.accentColor.opacity(0.07))
+
+          if let err = updater.installError {
+            Text(err)
+              .font(.caption2)
+              .foregroundStyle(.red)
+              .padding(.horizontal, 14)
+              .padding(.bottom, 6)
+          }
+        }
+      }
+
+      Divider()
+      HStack {
+        Text("tomp3  \(AppMeta.version)")
+          .font(.caption2)
+          .foregroundStyle(.tertiary)
+        Spacer()
+        Button("Quit") { NSApp.terminate(nil) }
+          .buttonStyle(.plain)
+          .font(.caption2)
+          .foregroundStyle(.secondary)
+      }
+      .padding(.horizontal, 14)
+      .padding(.vertical, 8)
     }
-    .padding(.horizontal, 14)
-    .padding(.vertical, 8)
   }
 
   // MARK: - Actions

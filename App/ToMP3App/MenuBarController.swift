@@ -8,12 +8,14 @@ final class MenuBarController {
   private var statusItem: NSStatusItem
   private var popover: NSPopover
   private let manager = ConversionManager()
+  private let updater = AppUpdateChecker()
 
   init() {
     statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
     popover    = NSPopover()
 
     configure()
+    updater.checkInBackground()
   }
 
   // MARK: - Setup
@@ -28,11 +30,13 @@ final class MenuBarController {
       button.target = self
     }
 
-    popover.contentSize  = NSSize(width: 340, height: 480)
+    popover.contentSize  = NSSize(width: 340, height: 520)
     popover.behavior     = .transient
     popover.animates     = true
     popover.contentViewController = NSHostingController(
-      rootView: StatusItemView().environmentObject(manager)
+      rootView: StatusItemView()
+        .environmentObject(manager)
+        .environmentObject(updater)
     )
   }
 

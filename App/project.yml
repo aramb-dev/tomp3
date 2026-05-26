@@ -22,7 +22,7 @@ settings:
     SWIFT_VERSION: "5.10"
     MARKETING_VERSION: "0.6"
     CURRENT_PROJECT_VERSION: "1"
-    DEVELOPMENT_TEAM: ""   # fill in your Team ID before signing
+    DEVELOPMENT_TEAM: "U8N2H82PMJ"
 
 targets:
 
