@@ -59,11 +59,12 @@ ok "CLI binary signed"
 
 # ─── 3. Build Xcode app ───────────────────────────────────────────────────────
 step "Generating Xcode project (xcodegen)"
-(cd "$SCRIPT_DIR/App" && xcodegen generate --quiet)
+(cd "$SCRIPT_DIR/App" && xcodegen generate -q)
 ok "Project generated"
 
 step "Archiving ToMP3App (Release)"
 rm -rf "$ARCHIVE_PATH" "$EXPORT_PATH"
+XCODE_LOG=$(mktemp)
 xcodebuild archive \
   -project "$SCRIPT_DIR/App/ToMP3App.xcodeproj" \
   -scheme ToMP3App \
@@ -72,16 +73,19 @@ xcodebuild archive \
   -allowProvisioningUpdates \
   DEVELOPMENT_TEAM="$TEAM_ID" \
   CODE_SIGN_IDENTITY="$APP_SIGN_ID" \
-  | grep -E "error:|warning:|Build succeeded|Archive succeeded" || true
+  > "$XCODE_LOG" 2>&1 || { grep "error:" "$XCODE_LOG"; rm -f "$XCODE_LOG"; exit 1; }
+rm -f "$XCODE_LOG"
 ok "Archive complete"
 
 step "Exporting signed .app (Developer ID)"
+EXPORT_LOG=$(mktemp)
 xcodebuild -exportArchive \
   -archivePath "$ARCHIVE_PATH" \
   -exportPath "$EXPORT_PATH" \
   -exportOptionsPlist "$EXPORT_OPTIONS" \
   -allowProvisioningUpdates \
-  | grep -E "error:|Export succeeded" || true
+  > "$EXPORT_LOG" 2>&1 || { grep "error:" "$EXPORT_LOG"; rm -f "$EXPORT_LOG"; exit 1; }
+rm -f "$EXPORT_LOG"
 ok "App exported: $EXPORT_PATH/ToMP3App.app"
 
 # ─── 4. Assemble payload ─────────────────────────────────────────────────────

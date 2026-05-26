@@ -10,4 +10,7 @@ DerivedData/
 # Generated Xcode project (run `xcodegen` in App/ to create)
 App/ToMP3App.xcodeproj/
 App/ToMP3App.xcworkspace/
+
+# Build artifacts
 installer/build/*.pkg
+installer/payload/Applications/
