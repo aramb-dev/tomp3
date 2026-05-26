@@ -110,7 +110,18 @@ struct UpdateCommand: AsyncParsableCommand {
     try? FileManager.default.removeItem(at: destURL)
 
     print("  \(Term.green)\(Term.bold)✓  tomp3 updated to v\(remoteVersion)!\(Term.reset)")
-    print("  \(Term.dim)Open a new terminal window for changes to take effect.\(Term.reset)\n")
+    print("")
+
+    // Relaunch the freshly installed binary so the user is already on the new version
+    let binaryPath = "/usr/local/bin/tomp3"
+    print("  \(Term.dim)Relaunching tomp3 v\(remoteVersion)…\(Term.reset)\n")
+    // Small pause so the message is readable before exec replaces the process
+    try? await Task.sleep(nanoseconds: 600_000_000)
+    execv(binaryPath, [strdup(binaryPath), nil])
+
+    // exec failed (e.g. binary not at expected path) — fall back gracefully
+    printWarn("Could not relaunch automatically. Open a new terminal to use tomp3 v\(remoteVersion).")
+    print("")
   }
 
   // ─── Helpers ──────────────────────────────────────────────────────────────

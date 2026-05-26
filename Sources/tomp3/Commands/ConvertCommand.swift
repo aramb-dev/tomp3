@@ -22,6 +22,12 @@ struct ConvertCommand: AsyncParsableCommand {
 
   // ─── Arguments & Options ────────────────────────────────────────────────────
 
+  @Flag(
+    name: .customShort("v"),
+    help: "Show the version and exit."
+  )
+  var showVersion: Bool = false
+
   @Argument(
     help: ArgumentHelp(
       "Input audio file(s) to convert.",
@@ -75,6 +81,11 @@ struct ConvertCommand: AsyncParsableCommand {
   // ─── Run ────────────────────────────────────────────────────────────────────
 
   func run() async throws {
+    if showVersion {
+      print(AppMeta.version)
+      return
+    }
+
     if !quiet { printHeader() }
 
     // Update check (async, non-blocking feel — runs before deps check)
@@ -256,7 +267,8 @@ struct ConvertCommand: AsyncParsableCommand {
     s = s.trimmingCharacters(in: .whitespaces)
     if s.hasPrefix("'") && s.hasSuffix("'") { s = String(s.dropFirst().dropLast()) }
     if s.hasPrefix("\"") && s.hasSuffix("\"") { s = String(s.dropFirst().dropLast()) }
-    s = s.replacingOccurrences(of: "\\ ", with: " ")
+    // Unescape any shell-escaped character (e.g. "\ ", "\(", "\)") → the bare char
+    s = s.replacingOccurrences(of: "\\\\(.)", with: "$1", options: .regularExpression)
     return s
   }
 
