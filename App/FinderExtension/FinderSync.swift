@@ -1,21 +1,20 @@
 import Cocoa
-import ToMP3Core
 import FinderSync
-import UserNotifications
 
 // MARK: - Finder Sync Extension
+//
+// This extension is sandboxed, so it cannot spawn processes (no ffmpeg).
+// Instead it delegates conversion to the main ToMP3App via the tomp3:// URL scheme.
 
 final class FinderSyncExtension: FIFinderSync {
 
   override init() {
     super.init()
-    // Watch all mounted volumes so the extension is active everywhere
+    // Watch all mounted volumes so the right-click menu appears everywhere
     FIFinderSyncController.default().directoryURLs = [
       URL(fileURLWithPath: "/"),
       URL(fileURLWithPath: NSHomeDirectory()),
     ]
-
-    UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { _, _ in }
   }
 
   // MARK: - Context Menu
@@ -28,13 +27,23 @@ final class FinderSyncExtension: FIFinderSync {
     item.image = NSImage(systemSymbolName: "waveform.badge.plus", accessibilityDescription: nil)
 
     let submenu = NSMenu(title: "Convert to MP3")
-    for preset in Preset.allCases {
+
+    // Presets in order from best to smallest
+    let presets: [(label: String, raw: String)] = [
+      ("High Quality (~190 kbps)",  "high"),
+      ("Standard (~130 kbps)",      "standard"),
+      ("Medium (~43 kbps)",         "medium"),
+      ("Small (~27 kbps)",          "small"),
+      ("Tiny (~15 kbps)",           "tiny"),
+    ]
+
+    for preset in presets {
       let sub = NSMenuItem(
-        title: preset.displayName,
+        title: preset.label,
         action: #selector(convertWithPreset(_:)),
         keyEquivalent: ""
       )
-      sub.representedObject = preset.rawValue
+      sub.representedObject = preset.raw
       sub.target = self
       submenu.addItem(sub)
     }
@@ -44,43 +53,29 @@ final class FinderSyncExtension: FIFinderSync {
     return root
   }
 
-  // MARK: - Conversion
+  // MARK: - Delegation via tomp3:// URL scheme
 
   @objc private func convertWithPreset(_ sender: NSMenuItem) {
     guard
-      let rawValue = sender.representedObject as? String,
-      let preset   = Preset(rawValue: rawValue),
-      let urls     = FIFinderSyncController.default().selectedItemURLs(),
+      let preset = sender.representedObject as? String,
+      let urls   = FIFinderSyncController.default().selectedItemURLs(),
       !urls.isEmpty
     else { return }
 
-    let jobs = urls.map { ConversionJob(input: $0, preset: preset) }
+    // Build tomp3://convert?preset=high&file=/path/to/file1&file=/path/to/file2
+    var components = URLComponents()
+    components.scheme = "tomp3"
+    components.host   = "convert"
 
-    Task {
-      let results = await FFmpegRunner.convertBatch(jobs) { _ in }
-      await notifyCompletion(results: results)
+    var items = [URLQueryItem(name: "preset", value: preset)]
+    for url in urls {
+      items.append(URLQueryItem(name: "file", value: url.path))
     }
-  }
+    components.queryItems = items
 
-  // MARK: - Notification
+    guard let deepLink = components.url else { return }
 
-  @MainActor
-  private func notifyCompletion(results: [ConversionResult]) {
-    let successCount = results.filter(\.success).count
-    let failCount    = results.count - successCount
-
-    let content = UNMutableNotificationContent()
-    content.title = "tomp3"
-    content.body  = failCount == 0
-      ? "\(successCount) file\(successCount == 1 ? "" : "s") converted to MP3"
-      : "\(successCount) converted, \(failCount) failed"
-    content.sound = .default
-
-    let req = UNNotificationRequest(
-      identifier: UUID().uuidString,
-      content: content,
-      trigger: nil
-    )
-    UNUserNotificationCenter.current().add(req)
+    // Open ToMP3App via the URL scheme — it handles the actual conversion
+    NSWorkspace.shared.open(deepLink)
   }
 }

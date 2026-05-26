@@ -50,5 +50,18 @@
 
   <key>NSHumanReadableCopyright</key>
   <string>© 2026 Abdur-Rahman Bilal</string>
+
+  <!-- URL scheme — used by the Finder extension to delegate conversions -->
+  <key>CFBundleURLTypes</key>
+  <array>
+    <dict>
+      <key>CFBundleURLName</key>
+      <string>dev.aramb.tomp3app</string>
+      <key>CFBundleURLSchemes</key>
+      <array>
+        <string>tomp3</string>
+      </array>
+    </dict>
+  </array>
 </dict>
 </plist>

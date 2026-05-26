@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.9
+- Fix: Finder extension now properly registers with macOS (was missing sandbox entitlement)
+- Finder right-click now delegates to menu bar app via tomp3:// URL scheme (no more in-extension ffmpeg)
+- Fix: FinderSetup.bundleID corrected to dev.aramb.tomp3app.findersync
+
+
 ## v0.8
 - Add Finder Extension setup guide — CLI: tomp3 setup-finder, menu bar: inline step-by-step banner
 - Add right-click context menu on menu bar icon: Check for Updates / Quit

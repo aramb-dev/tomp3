@@ -20,7 +20,7 @@ configs:
 settings:
   base:
     SWIFT_VERSION: "5.10"
-    MARKETING_VERSION: "0.8"
+    MARKETING_VERSION: "0.9"
     CURRENT_PROJECT_VERSION: "1"
     DEVELOPMENT_TEAM: "U8N2H82PMJ"
 
@@ -72,4 +72,4 @@ targets:
     entitlements:
       path: FinderExtension/FinderExtension.entitlements
       properties:
-        com.apple.security.files.user-selected.read-write: true
+        com.apple.security.app-sandbox: true

@@ -1,5 +1,6 @@
 import AppKit
 import SwiftUI
+import ToMP3Core
 
 // MARK: - Menu Bar Controller
 
@@ -40,6 +41,12 @@ final class MenuBarController {
         .environmentObject(manager)
         .environmentObject(updater)
     )
+  }
+
+  // MARK: - Public API (called by AppDelegate for Finder extension URL scheme)
+
+  func convert(urls: [URL], preset: Preset) {
+    manager.convert(urls: urls, preset: preset)
   }
 
   // MARK: - Click handling

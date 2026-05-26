@@ -4,7 +4,7 @@ import Foundation
 
 public enum FinderSetup {
 
-  public static let bundleID  = "dev.aramb.tomp3.FinderExtension"
+  public static let bundleID  = "dev.aramb.tomp3app.findersync"
   public static let settingsURL = URL(string: "x-apple.systempreferences:com.apple.ExtensionsPreferences")!
 
   /// Whether the Finder Sync extension is currently enabled.
