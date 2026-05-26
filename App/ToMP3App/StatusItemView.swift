@@ -61,6 +61,7 @@ struct StatusItemView: View {
         Text(preset.rawValue.capitalized).tag(preset)
       }
     }
+    .labelsHidden()
     .pickerStyle(.segmented)
     .padding(.horizontal, 14)
     .padding(.vertical, 8)
