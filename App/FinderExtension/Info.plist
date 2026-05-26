@@ -2,16 +2,35 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+  <key>CFBundleDevelopmentRegion</key>
+  <string>en</string>
+
+  <key>CFBundleExecutable</key>
+  <string>$(EXECUTABLE_NAME)</string>
+
   <key>CFBundleIdentifier</key>
-  <string>dev.aramb.tomp3app.findersync</string>
+  <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+
+  <key>CFBundleInfoDictionaryVersion</key>
+  <string>6.0</string>
+
   <key>CFBundleName</key>
   <string>FinderExtension</string>
-  <key>CFBundleVersion</key>
-  <string>1</string>
-  <key>CFBundleShortVersionString</key>
-  <string>0.6</string>
+
   <key>CFBundlePackageType</key>
-  <string>XPC!</string>
+  <string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
+
+  <!-- Version synced from build settings — matches the main app -->
+  <key>CFBundleShortVersionString</key>
+  <string>$(MARKETING_VERSION)</string>
+
+  <key>CFBundleVersion</key>
+  <string>$(CURRENT_PROJECT_VERSION)</string>
+
+  <key>LSMinimumSystemVersion</key>
+  <string>$(MACOSX_DEPLOYMENT_TARGET)</string>
+
+  <!-- Finder Sync extension point -->
   <key>NSExtension</key>
   <dict>
     <key>NSExtensionPointIdentifier</key>
@@ -19,7 +38,5 @@
     <key>NSExtensionPrincipalClass</key>
     <string>$(PRODUCT_MODULE_NAME).FinderSyncExtension</string>
   </dict>
-  <key>LSMinimumSystemVersion</key>
-  <string>13.0</string>
 </dict>
 </plist>
