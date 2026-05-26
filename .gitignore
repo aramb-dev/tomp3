@@ -6,3 +6,7 @@ xcuserdata/
 *.xcworkspace/
 DerivedData/
 .swiftpm/
+
+# Generated Xcode project (run `xcodegen` in App/ to create)
+App/ToMP3App.xcodeproj/
+App/ToMP3App.xcworkspace/

@@ -1,0 +1,75 @@
+name: ToMP3App
+
+options:
+  bundleIdPrefix: dev.aramb
+  deploymentTarget:
+    macOS: "13.0"
+  xcodeVersion: "15.0"
+  generateEmptyDirectories: true
+  createIntermediateGroups: true
+
+packages:
+  # Pull ToMP3Core from the root Swift Package
+  ToMP3Core:
+    path: ..
+
+configs:
+  Debug:   debug
+  Release: release
+
+settings:
+  base:
+    SWIFT_VERSION: "5.10"
+    MARKETING_VERSION: "0.6"
+    CURRENT_PROJECT_VERSION: "1"
+    DEVELOPMENT_TEAM: ""   # fill in your Team ID before signing
+
+targets:
+
+  # ── Menu bar app ──────────────────────────────────────────────────────────────
+  ToMP3App:
+    type: application
+    platform: macOS
+    deploymentTarget: "13.0"
+    sources:
+      - path: ToMP3App
+        excludes:
+          - "*.entitlements"
+    dependencies:
+      - target: FinderExtension
+        embed: true
+      - package: ToMP3Core
+        product: ToMP3Core
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.aramb.tomp3app
+        INFOPLIST_FILE: ToMP3App/Info.plist
+        CODE_SIGN_ENTITLEMENTS: ToMP3App/ToMP3App.entitlements
+        ENABLE_HARDENED_RUNTIME: YES
+    entitlements:
+      path: ToMP3App/ToMP3App.entitlements
+      properties:
+        com.apple.security.files.user-selected.read-write: true
+
+  # ── Finder Sync Extension ─────────────────────────────────────────────────────
+  FinderExtension:
+    type: app-extension
+    platform: macOS
+    deploymentTarget: "13.0"
+    sources:
+      - path: FinderExtension
+        excludes:
+          - "*.entitlements"
+    dependencies:
+      - package: ToMP3Core
+        product: ToMP3Core
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.aramb.tomp3app.findersync
+        INFOPLIST_FILE: FinderExtension/Info.plist
+        CODE_SIGN_ENTITLEMENTS: FinderExtension/FinderExtension.entitlements
+        ENABLE_HARDENED_RUNTIME: YES
+    entitlements:
+      path: FinderExtension/FinderExtension.entitlements
+      properties:
+        com.apple.security.files.user-selected.read-write: true
