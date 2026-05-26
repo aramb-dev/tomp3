@@ -26,11 +26,24 @@ func printWarn(_ msg: String) { print("  \(Term.yellow)⚠\(Term.reset) \(msg)")
 func printError(_ msg: String){ fputs("\n  \(Term.red)✗ \(msg)\(Term.reset)\n\n", stderr) }
 
 func printHeader() {
+  let width    = 42
+  let title    = "tomp3 converter  v\(AppMeta.version)"
+  let subtitle = "by aramb-dev"
+
+  func centered(_ text: String) -> String {
+    let pad   = width - text.count
+    let left  = pad / 2
+    let right = pad - left
+    return String(repeating: " ", count: left) + text + String(repeating: " ", count: right)
+  }
+
+  let bar = String(repeating: "─", count: width)
+
   print("")
-  print("  \(Term.bold)\(Term.cyan)┌──────────────────────────────────────────┐\(Term.reset)")
-  print("  \(Term.bold)\(Term.cyan)│           tomp3 converter  v\(AppMeta.version)             │\(Term.reset)")
-  print("  \(Term.bold)\(Term.cyan)│              by aramb-dev                │\(Term.reset)")
-  print("  \(Term.bold)\(Term.cyan)└──────────────────────────────────────────┘\(Term.reset)")
+  print("  \(Term.bold)\(Term.cyan)┌\(bar)┐\(Term.reset)")
+  print("  \(Term.bold)\(Term.cyan)│\(centered(title))│\(Term.reset)")
+  print("  \(Term.bold)\(Term.cyan)│\(centered(subtitle))│\(Term.reset)")
+  print("  \(Term.bold)\(Term.cyan)└\(bar)┘\(Term.reset)")
   print("")
 }
 
