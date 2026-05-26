@@ -10,7 +10,10 @@ struct StatusItemView: View {
   @EnvironmentObject private var updater: AppUpdateChecker
   @State private var selectedPreset: Preset = .high
   @State private var isTargeted = false
-  @State private var justDropped = false   // brief "got it" flash
+  @State private var justDropped = false
+
+  /// Persisted: user confirmed extension is set up (or dismissed the banner)
+  @AppStorage("finderSetupDone") private var finderSetupDone = false
 
   // Accepted media UTTypes
   private let acceptedTypes: [UTType] = [
@@ -20,7 +23,6 @@ struct StatusItemView: View {
     UTType("com.microsoft.waveform-audio")!,
   ]
 
-  // Running jobs count
   private var runningCount: Int { manager.activeJobs.filter { !$0.isComplete }.count }
 
   var body: some View {
@@ -30,6 +32,10 @@ struct StatusItemView: View {
       presetPicker
       Divider()
       dropZone
+      if !finderSetupDone {
+        Divider()
+        finderSetupBanner
+      }
       Divider()
       queueSection
       Spacer(minLength: 0)
@@ -116,6 +122,84 @@ struct StatusItemView: View {
 
   private var dropFillColor: Color {
     justDropped ? Color.accentColor.opacity(0.06) : (isTargeted ? Color.accentColor.opacity(0.08) : Color.clear)
+  }
+
+  // MARK: - Finder Setup Banner
+
+  private var finderSetupBanner: some View {
+    VStack(alignment: .leading, spacing: 10) {
+
+      // Header row
+      HStack(alignment: .top) {
+        Image(systemName: "puzzlepiece.extension.fill")
+          .foregroundStyle(Color.accentColor)
+          .font(.callout)
+        VStack(alignment: .leading, spacing: 2) {
+          Text("Enable Finder Extension")
+            .font(.caption)
+            .fontWeight(.semibold)
+          Text("Right-click any audio or video file in Finder to convert.")
+            .font(.caption2)
+            .foregroundStyle(.secondary)
+        }
+        Spacer()
+        Button {
+          finderSetupDone = true
+        } label: {
+          Image(systemName: "xmark")
+            .font(.caption2)
+            .foregroundStyle(.secondary)
+        }
+        .buttonStyle(.plain)
+      }
+
+      // Steps
+      VStack(alignment: .leading, spacing: 5) {
+        finderStep(number: "1", text: "Click **Open Settings** below")
+        finderStep(number: "2", text: "Select **Finder Extensions** in the sidebar")
+        finderStep(number: "3", text: "Tick the checkbox next to **tomp3**")
+      }
+
+      // Action buttons
+      HStack(spacing: 8) {
+        Button {
+          NSWorkspace.shared.open(FinderSetup.settingsURL)
+        } label: {
+          HStack(spacing: 4) {
+            Text("Open Settings")
+            Image(systemName: "arrow.up.right.square")
+              .font(.caption2)
+          }
+          .font(.caption)
+        }
+        .buttonStyle(.borderedProminent)
+        .controlSize(.small)
+
+        Button("Done, it's set up  ✓") {
+          finderSetupDone = true
+        }
+        .buttonStyle(.plain)
+        .font(.caption)
+        .foregroundStyle(Color.accentColor)
+      }
+    }
+    .padding(.horizontal, 14)
+    .padding(.vertical, 10)
+    .background(Color.accentColor.opacity(0.05))
+  }
+
+  private func finderStep(number: String, text: LocalizedStringKey) -> some View {
+    HStack(alignment: .top, spacing: 6) {
+      Text(number)
+        .font(.caption2)
+        .fontWeight(.semibold)
+        .foregroundStyle(.white)
+        .frame(width: 16, height: 16)
+        .background(Color.accentColor, in: Circle())
+      Text(text)
+        .font(.caption2)
+        .foregroundStyle(.secondary)
+    }
   }
 
   // MARK: - Queue Section
