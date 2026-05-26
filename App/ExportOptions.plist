@@ -8,12 +8,12 @@
   <key>teamID</key>
   <string>U8N2H82PMJ</string>
 
-  <!-- Let Xcode pick the right Developer ID Application cert automatically -->
+  <!-- Automatic signing — Xcode manages the provisioning profile -->
   <key>signingStyle</key>
   <string>automatic</string>
 
-  <!-- Include the Finder extension inside the app bundle -->
-  <key>embedOnDemandResourcesAssetPacksInBundle</key>
-  <true/>
+  <!-- Don't re-sign after export; the archive is already signed -->
+  <key>signingCertificate</key>
+  <string>Developer ID Application</string>
 </dict>
 </plist>
