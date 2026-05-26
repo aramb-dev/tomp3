@@ -75,10 +75,10 @@ ITEMS_JS=""
 for note in "${NOTES[@]}"; do
   # Escape double quotes for JS string
   escaped="${note//\"/\\\"}"
-  ITEMS_JS+="      \"$escaped\",\n"
+  ITEMS_JS+="      \"$escaped\","$'\n'
 done
 
-NEW_ENTRY="  {\n    version: \"$VERSION\",\n    items: [\n$ITEMS_JS    ],\n  },"
+NEW_ENTRY="  {"$'\n'"    version: \"$VERSION\","$'\n'"    items: ["$'\n'"$ITEMS_JS""    ],"$'\n'"  },"
 
 # Insert new entry at the top of the changelog array
 # Write entry to a tmpfile so slashes/quotes in notes don't break the regex
